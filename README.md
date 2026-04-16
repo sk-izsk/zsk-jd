@@ -1,17 +1,108 @@
 # zsk-jd — Job Description Resume Tailoring Skill
 
-> Paste a job description. Get a tailored, ATS-optimized LaTeX resume and cover letter. With skill-gap warnings and interview probability scoring. Works on any LLM.
+> Paste a job description. Get a tailored, ATS-optimized resume and cover letter — in **PDF or LaTeX**. With skill-gap warnings and interview probability scoring. Works on any LLM.
 
 ---
 
 ## What It Does
 
 1. You paste a job description using `/zsk-jd`
-2. Claude parses the JD — extracts required skills, seniority, keywords, tone
-3. Compares against your resume — shows match score + interview probability
-4. Warns you in red if the fit is weak **before** generating anything
-5. On your confirmation, outputs a fully tailored LaTeX resume (and optional cover letter)
-6. All output follows strict ATS rules — no banned words, no robotic phrasing, varied bullet structure
+2. Claude detects your resume format (PDF or LaTeX) and sets output mode accordingly
+3. Claude parses the JD — extracts required skills, seniority, keywords, tone
+4. Compares against your resume — shows match score + interview probability
+5. Warns you in red if the fit is weak **before** generating anything
+6. On your confirmation, outputs a fully tailored resume + optional cover letter
+7. All output follows strict ATS rules — no banned words, no robotic phrasing, varied bullet structure
+
+---
+
+## Two Ways to Use This Skill
+
+### Way 1 — PDF Mode
+
+Your resume lives as `base_resume.pdf`. The skill reads it, tailors it, and outputs a clean PDF resume (and PDF cover letter if requested). No LaTeX knowledge required.
+
+**Best for:** Anyone who doesn't work with LaTeX, prefers a ready-to-send PDF, or wants the simplest setup.
+
+```
+your-project/
+├── base_resume.pdf    ← skill reads and outputs PDF automatically
+└── SKILL.md
+```
+
+### Way 2 — LaTeX Mode
+
+Your resume lives as `base_resume.tex`. The skill tailors the LaTeX source directly and outputs a compilable `.tex` file. Full control over formatting, surgical edits only, and `--patch` mode available.
+
+**Best for:** Developers who maintain a LaTeX resume, want version-controlled diffs, or need maximum token efficiency.
+
+```
+your-project/
+├── base_resume.tex    ← skill reads and outputs LaTeX automatically
+└── SKILL.md
+```
+
+### Which One Should You Use?
+
+| | PDF Mode | LaTeX Mode |
+|---|---|---|
+| Setup effort | Low — just place your PDF | Medium — requires LaTeX resume |
+| Output format | Ready-to-send PDF | Compilable .tex (needs pdflatex/Overleaf) |
+| Token efficiency | Moderate | **Best** (especially with --patch) |
+| Patch/diff support | No — full output always | Yes — `--patch` outputs changed blocks only |
+| Cover letter output | PDF | LaTeX |
+| Best for | Non-developers, quick turnaround | Developers, version control, token savings |
+
+**Recommendation:** If you have a LaTeX resume, use LaTeX mode — it is significantly more token-efficient and gives you patch diffs. If you don't, PDF mode is the easier path with zero setup overhead.
+
+---
+
+## Priority Order
+
+If multiple resume sources exist, the skill uses this priority. **First match wins.**
+
+```
+1. base_resume.pdf   ← highest priority → output: PDF
+2. base_resume.tex   ← second priority  → output: LaTeX
+3. Inline PDF paste  ← fallback         → output: PDF
+4. Inline LaTeX paste← fallback         → output: LaTeX
+```
+
+If both `base_resume.pdf` and `base_resume.tex` exist in the same directory, **PDF wins**.
+
+Output format always mirrors input format — PDF in, PDF out. LaTeX in, LaTeX out.
+
+---
+
+## Token Usage Comparison
+
+### LaTeX vs PDF as input format
+
+| Factor | PDF input | LaTeX input |
+|--------|-----------|-------------|
+| Extraction overhead | High — LLM must parse visual layout | None — already structured markup |
+| Formatting ambiguity | Claude must infer structure from text | Explicit in environments and commands |
+| Edit precision | Full rewrite required | Surgical section edits only |
+| Patch mode available | No | Yes — `--patch` outputs diffs |
+| Re-use across sessions | Must re-read file each session | File persists, zero re-read cost |
+| Output accuracy | Layout can drift between reads | Compilable, deterministic output |
+
+### Token cost estimates by approach
+
+| Approach | Input tokens | Output tokens | Total (est.) |
+|----------|-------------|---------------|--------------|
+| Naive: "Rewrite my resume for this JD" (paste PDF text) | ~2,000–4,000 | ~1,500–3,000 | ~5,500 avg |
+| zsk-jd PDF mode with `base_resume.pdf` | ~1,500–2,500 | ~1,200–2,000 | ~3,200 avg |
+| zsk-jd LaTeX mode with `base_resume.tex` | ~1,200–2,000 | ~800–1,500 | ~2,500 avg |
+| zsk-jd LaTeX mode `--patch` | ~600–900 | ~300–600 | ~1,100 avg |
+| zsk-jd `--cover-only` (either mode) | ~600–900 | ~400–700 | ~1,200 avg |
+
+**Bottom line:**
+
+- LaTeX `--patch` mode is **4–5x cheaper** than a naive paste-and-ask approach
+- LaTeX full mode is **~2x cheaper** than PDF mode for the same output quality
+- PDF mode is still **~2x cheaper** than naive pasting with no skill
+- The warning gate eliminates back-and-forth clarification rounds that waste tokens
 
 ---
 
@@ -29,7 +120,7 @@ Copies `SKILL.md` and `base_resume.tex` template into current directory.
 
 1. Download ZIP from [github.com/sk-izsk/zsk-jd](https://github.com/sk-izsk/zsk-jd)
 2. Extract → copy `SKILL.md` into your project
-3. Rename `base_resume.tex` to match your resume, or replace contents
+3. Add your resume as `base_resume.pdf` or `base_resume.tex`
 
 ### Load into your AI tool
 
@@ -59,44 +150,44 @@ Works on any LLM that accepts markdown system instructions:
 
 ---
 
-## Setup — Two Ways to Provide Your Resume
+## Setup — Resume Sources in Detail
 
-### Option A: `base_resume.tex` file (Recommended — zero tokens per session)
+### PDF Mode: `base_resume.pdf` (Recommended for non-developers)
+
+Place your PDF resume in your project root:
+
+```
+your-project/
+├── base_resume.pdf       ← skill reads this automatically
+└── SKILL.md
+```
+
+The skill detects it, extracts the content, tailors it, and outputs a clean PDF. You never paste anything. Cover letters are also output as PDF.
+
+**Don't have a PDF resume?**
+Export from Word, Google Docs, or any editor. Any standard single-column resume PDF works.
+
+### LaTeX Mode: `base_resume.tex` (Recommended for developers)
 
 Place your LaTeX resume in your project root:
 
 ```
 your-project/
 ├── base_resume.tex       ← skill reads this automatically
-└── .cursor/              (or wherever you store skills)
+└── SKILL.md
 ```
 
-The skill detects and loads it automatically. **You never paste it again.** This is the priority source — if the file exists, it always wins over a pasted resume.
+The skill performs surgical edits — only rewrites the summary, reorders skills, and adjusts bullet points. Everything else stays untouched. Use `--patch` to get only the changed blocks as a diff.
 
-### Option B: Inline paste (fallback)
+**Don't have a LaTeX resume yet?**
 
-If no `base_resume.tex` exists, the skill will ask you once per session:
-
-```
-⚠ No resume found. Paste your LaTeX resume now.
-```
-
-Paste it once. It's stored for the rest of the session.
-
----
-
-## Don't Have a LaTeX Resume Yet?
-
-No problem. You have two easy paths:
-
-**Option 1 — Overleaf (easiest)**
+Option 1 — Overleaf (easiest):
 
 1. Go to [overleaf.com](https://www.overleaf.com)
 2. Create free account → New Project → choose a resume template
-3. Edit your details in the visual editor
-4. Download as `.tex` → save as `base_resume.tex`
+3. Edit your details → Download as `.tex` → save as `base_resume.tex`
 
-**Option 2 — Ask Claude**
+Option 2 — Ask Claude:
 
 ```
 Convert my resume into LaTeX. Here is my resume in plain text: [paste]
@@ -126,7 +217,7 @@ Save the output as `base_resume.tex`.
 /zsk-jd [JD] --cover-only
 ```
 
-### Patch mode — only changed sections (faster, fewer tokens)
+### Patch mode — changed sections only (LaTeX mode only)
 
 ```
 /zsk-jd [JD] --patch
@@ -136,12 +227,12 @@ Save the output as `base_resume.tex`.
 
 | Flag | What it does | Default |
 |------|-------------|---------|
-| *(none)* | Full tailored LaTeX resume | ✓ |
+| *(none)* | Full tailored resume (PDF or LaTeX) | ✓ |
 | `--cover` | Resume + 3-paragraph cover letter | off |
 | `--cover-only` | Cover letter only | off |
 | `--cover-short` | Resume + 2-paragraph cover letter | off |
 | `--cover-long` | Resume + 4-5 paragraph cover letter | off |
-| `--patch` | Output changed sections only, not full file | off |
+| `--patch` | Changed sections only — LaTeX mode only | off |
 | `--tone=formal` | Formal cover letter tone | ✓ |
 | `--tone=casual` | Warmer, less stiff tone | off |
 
@@ -165,45 +256,16 @@ Interview Odds:  ~45%
 
 Seniority:  JD wants 7+ yrs / You have ~5 yrs  →  slight gap
 Industry:   FinTech  →  match
+Output mode: PDF
 
 Proceed with tailoring? Reply YES to continue or NO to cancel.
 ```
 
-If more than half of required skills are missing or match score is below 50, you get a stronger red warning with a recommendation to reconsider before proceeding.
-
-If you reply **NO**, the skill tells you exactly what skills to build to become a stronger candidate for this role.
-
----
-
-## Token Usage Comparison
-
-This skill is designed to minimize token consumption vs. naive approaches.
-
-| Approach | Input tokens | Output tokens | Total (est.) |
-|----------|-------------|---------------|--------------|
-| "Rewrite my resume for this job" (no skill, paste PDF text) | ~2,000-4,000 | ~1,500-3,000 | ~5,500 avg |
-| zsk-jd with inline LaTeX paste (first use) | ~1,200-2,000 | ~800-1,500 | ~3,200 avg |
-| zsk-jd with `base_resume.tex` (file loaded, not pasted) | ~600-900 | ~800-1,500 | ~1,700 avg |
-| zsk-jd `--patch` mode | ~600-900 | ~300-600 | ~1,100 avg |
-| zsk-jd `--cover-only` | ~600-900 | ~400-700 | ~1,200 avg |
-
-**Bottom line:** Using `base_resume.tex` + `--patch` mode is roughly **4-5x cheaper** than a naive paste-and-ask approach. The skill also eliminates back-and-forth clarification rounds that waste tokens.
-
-### Why LaTeX beats PDF for tokens
-
-| Factor | PDF input | LaTeX input |
-|--------|-----------|-------------|
-| Extraction overhead | High — OCR/parse needed | None — already structured |
-| Formatting ambiguity | Claude must guess layout | Explicit in markup |
-| Edit precision | Full rewrite often needed | Surgical edits only |
-| Re-use across sessions | Must paste every time | File persists |
-| Output accuracy | Formatting can drift | Compilable output |
+If more than half of required skills are missing or match score is below 50, you get a stronger red warning. If you reply **NO**, the skill tells you exactly what to build to become a stronger candidate.
 
 ---
 
 ## ATS Rules Enforced
-
-The skill automatically enforces these rules on every resume and cover letter it generates:
 
 **Never uses:**
 
@@ -219,38 +281,7 @@ The skill automatically enforces these rules on every resume and cover letter it
 - Uses the JD's own vocabulary naturally
 - Writes professional summary in a unique, human voice specific to the role
 - Matches the tone register of the JD (startup vs corporate)
-- Keeps LaTeX compilable — no broken environments
-
----
-
-## Example Session
-
-```
-You:    /zsk-jd We are looking for a Senior Backend Engineer with 6+ years experience
-        in Go, Kubernetes, and distributed systems. Experience with gRPC and AWS 
-        required. FinTech background preferred. [...]
-
-Claude: ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-        🔴 SKILL GAP ANALYSIS — Senior Backend Engineer @ FinCo
-        ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-        Match Score:     48/100
-        Interview Odds:  ~22%
-        ✅ Matched:   AWS, distributed systems, PostgreSQL
-        ❌ Missing:   Go, Kubernetes, gRPC
-        Seniority:   JD wants 6 yrs / You have ~4 yrs  →  gap
-        
-        🔴 WARNING: SIGNIFICANT MISMATCH DETECTED
-        More than half of required skills not found in your resume.
-        Proceed anyway? Reply YES to continue or NO to cancel.
-
-You:    NO
-
-Claude: Understood. To be competitive for this role, focus on:
-        - Go: build 1-2 projects, target 3-6 months
-        - Kubernetes: CKA cert or deploy personal project on k8s
-        - gRPC: add to an existing Go service
-        Re-run /zsk-jd once you have these to show on your resume.
-```
+- Keeps output compilable or valid — no broken LaTeX environments, no malformed PDF
 
 ---
 
@@ -258,7 +289,9 @@ Claude: Understood. To be competitive for this role, focus on:
 
 - The skill cannot fabricate skills or experience you don't have — it only surfaces and repositions what's real
 - Interview probability is an estimate based on keyword and seniority alignment, not a recruiter's actual decision
+- PDF output uses reportlab — visual fidelity matches the original resume's structure but font rendering may differ slightly from the source
 - LaTeX output must be compiled — use Overleaf, pdflatex, or XeLaTeX locally
+- `--patch` is only available in LaTeX mode
 - Very niche or unusual LaTeX resume packages may need minor manual adjustments after output
 
 ---
@@ -267,7 +300,8 @@ Claude: Understood. To be competitive for this role, focus on:
 
 ```
 your-project/
-├── base_resume.tex        ← your base resume (skill auto-loads this)
+├── base_resume.pdf        ← PDF resume (highest priority — use this OR .tex)
+├── base_resume.tex        ← LaTeX resume (second priority)
 ├── SKILL.md               ← the skill instructions (load into your AI tool)
 └── README.md              ← this file
 ```
