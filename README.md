@@ -15,6 +15,34 @@
 
 ---
 
+## Install
+
+### Option 1 — npx (fastest)
+
+```bash
+npx zsk-jd init
+```
+
+Copies `SKILL.md` and `base_resume.tex` template into current directory.
+
+### Option 2 — Manual (zip)
+
+1. Download ZIP from [github.com/sk-izsk/zsk-jd](https://github.com/sk-izsk/zsk-jd)
+2. Extract → copy `SKILL.md` into your project
+3. Rename `base_resume.tex` to match your resume, or replace contents
+
+### Load into your AI tool
+
+| Tool | How |
+|------|-----|
+| **Cursor** | Add `SKILL.md` content to `.cursorrules` |
+| **Claude** | Paste `SKILL.md` at start of conversation |
+| **Copilot** | Add to `.github/copilot-instructions.md` |
+| **Gemini CLI** | `--system` flag with `SKILL.md` content |
+| **ChatGPT** | Paste into Custom Instructions |
+
+---
+
 ## Compatibility
 
 Works on any LLM that accepts markdown system instructions:
@@ -62,15 +90,18 @@ Paste it once. It's stored for the rest of the session.
 No problem. You have two easy paths:
 
 **Option 1 — Overleaf (easiest)**
+
 1. Go to [overleaf.com](https://www.overleaf.com)
 2. Create free account → New Project → choose a resume template
 3. Edit your details in the visual editor
 4. Download as `.tex` → save as `base_resume.tex`
 
 **Option 2 — Ask Claude**
+
 ```
 Convert my resume into LaTeX. Here is my resume in plain text: [paste]
 ```
+
 Save the output as `base_resume.tex`.
 
 ---
@@ -78,21 +109,25 @@ Save the output as `base_resume.tex`.
 ## Usage
 
 ### Basic — resume only
+
 ```
 /zsk-jd [paste job description here]
 ```
 
 ### Resume + cover letter
+
 ```
 /zsk-jd [JD] --cover
 ```
 
 ### Cover letter only
+
 ```
 /zsk-jd [JD] --cover-only
 ```
 
 ### Patch mode — only changed sections (faster, fewer tokens)
+
 ```
 /zsk-jd [JD] --patch
 ```
@@ -171,6 +206,7 @@ This skill is designed to minimize token consumption vs. naive approaches.
 The skill automatically enforces these rules on every resume and cover letter it generates:
 
 **Never uses:**
+
 - Em dashes
 - Banned words: meticulous, orchestrated, pioneered, championed, realm, helm, showcasing, comprehensive, demonstrating, boost, measurable
 - Robotic phrases: "proven record", "known for", "intersection of", "results-driven", "passionate about"
@@ -178,6 +214,7 @@ The skill automatically enforces these rules on every resume and cover letter it
 - Generic bullets ("Responsible for...", "Worked on...")
 
 **Always does:**
+
 - Varies bullet sentence structure across all bullet points
 - Uses the JD's own vocabulary naturally
 - Writes professional summary in a unique, human voice specific to the role
@@ -249,5 +286,9 @@ your-project/
 | **ChatGPT** | Paste into Custom Instructions → "What would you like ChatGPT to know?" |
 
 ---
+
+## License
+
+MIT — free to use, modify, and distribute.
 
 *Made for job seekers who want real ATS results without token waste.*
