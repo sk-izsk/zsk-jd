@@ -20,7 +20,7 @@
 ### Option 1 — npx (fastest)
 
 ```bash
-npx zsk-jd init
+npx skills add https://github.com/sk-izsk/zsk-jd
 ```
 
 Copies `SKILL.md` and `base_resume.tex` template into current directory.
