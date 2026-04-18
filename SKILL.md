@@ -38,13 +38,14 @@ If neither file nor paste exists, output exactly:
 /zsk-jd [JD] --cover-short        → cover letter 2 paragraphs
 /zsk-jd [JD] --cover-long         → cover letter 4-5 paragraphs
 /zsk-jd [JD] --patch              → diff/changed sections only (LaTeX mode only)
+/zsk-jd [JD] --file               → write output to a downloadable file (LaTeX mode only)
 /zsk-jd [JD] --tone=formal        → formal cover letter register
 /zsk-jd [JD] --tone=casual        → warmer, less stiff cover letter
 ```
 
-Default output: **full resume file (PDF or LaTeX)**. Default cover letter: **off**. Default tone: **formal**.
+Default output: **full resume inline (LaTeX) or downloadable file (PDF)**. Default cover letter: **off**. Default tone: **formal**.
 
-Note: `--patch` mode is only available in LaTeX mode. In PDF mode, full output is always generated.
+Note: `--patch` and `--file` are only available in LaTeX mode. In PDF mode, full downloadable output is always generated.
 
 ## Step 1 — Detect Resume Format & Source
 
@@ -142,6 +143,32 @@ Proceed with tailoring? Reply YES to continue or NO to cancel.
 - **Job titles / section headers:** Keep factually accurate. Never fabricate.
 - **Do not add:** Skills, companies, degrees, or experience the user does not have.
 
+### Missing Skills — Honest Positioning (STRICT RULE)
+
+**Never fabricate. Never exaggerate. Never imply the candidate has a skill they do not have.**
+
+When the resume is missing a required JD skill, apply this reframing hierarchy in order:
+
+1. **Transferable foundation exists** — If the candidate has adjacent or related experience, surface it explicitly. Example: missing Kubernetes but has Docker + CI/CD → write a bullet that shows container orchestration awareness without claiming Kubernetes proficiency.
+
+2. **Active learning signal** — If no adjacent experience exists, frame the candidate as someone actively moving toward this skill. Use concrete language: "currently building with", "deepening expertise in", "applying [related skill] toward [missing area]". Never vague: never write "familiar with", "exposure to", or "basic knowledge of" — these read as red flags to recruiters.
+
+3. **Quick-learner positioning** — In the professional summary or a cover letter paragraph, include one honest signal of fast skill acquisition using evidence from the resume itself (e.g., picked up X in Y timeframe, shipped Z without prior experience in W). Do not invent examples — use only what exists in the resume.
+
+4. **Silence is better than a lie** — If none of the above apply, leave the skill out entirely. Do not list it in skills, do not mention it in bullets. A gap is less damaging than a detectable fabrication.
+
+**The goal:** The candidate should never sound like they are hiding something, but should never sound unqualified either. Position gaps as investment areas, not ignorance. One well-placed "actively expanding into [skill]" in a summary reads as self-aware and growth-oriented — recruiters respond well to this.
+
+**Banned reframing language (sounds fake to recruiters):**
+- "familiar with", "exposure to", "basic knowledge of", "some experience with", "working knowledge of"
+- Any bullet that mentions a missing skill as if the candidate used it in a project they didn't
+
+**Allowed honest reframing language:**
+- "building on [adjacent skill] to extend into [missing area]"
+- "currently developing [skill] through [specific context]"
+- "applied [transferable skill] in contexts that map directly to [JD need]"
+- "background in [related domain] with active focus on [gap area]"
+
 ### PDF mode output:
 Use reportlab (platypus) to generate a clean, professional PDF resume. Preserve the visual structure and section layout of the original. Output as a downloadable `.pdf` file.
 
@@ -171,13 +198,15 @@ doc = SimpleDocTemplate(
 Cover letter PDF uses the same margins and font family as the resume PDF.
 
 ### LaTeX mode output:
-- Default (no flag): Full LaTeX file, complete, compilable.
-- `--patch`: Output only changed LaTeX blocks, clearly marked:
+- **Never create a downloadable file for LaTeX output.** Always output LaTeX directly in the chat as a fenced code block (` ```latex `) so the user can copy it. Only generate a downloadable `.tex` file if the user explicitly requests one with `--file`.
+- Default (no flag): Full LaTeX content inline in chat, complete and compilable, inside a single fenced code block.
+- `--patch`: Output only changed LaTeX blocks inline, clearly marked:
   ```latex
   % ── ZSK-JD PATCH: summary ──────────────
   [changed block here]
   % ── END PATCH ───────────────────────────
   ```
+- `--file`: Only when this flag is present, write the `.tex` content to a downloadable file instead of inline output.
 
 ## Step 6 — Cover Letter (if --cover / --cover-only / --cover-short / --cover-long)
 
@@ -220,22 +249,26 @@ Output format matches resume format: PDF cover letter if in PDF mode, LaTeX if i
 
 | Flag | Effect | Default |
 |------|--------|---------|
-| (none) | Full tailored resume (PDF or LaTeX) | ✓ |
+| (none) | Full tailored resume (PDF download or LaTeX inline) | ✓ |
 | `--cover` | Resume + 3-para cover letter | off |
 | `--cover-only` | Cover letter only | off |
 | `--cover-short` | Resume + 2-para cover letter | off |
 | `--cover-long` | Resume + 4-5 para cover letter | off |
 | `--patch` | Changed sections only — LaTeX mode only | off |
+| `--file` | Write LaTeX to downloadable file instead of inline — LaTeX mode only | off |
 | `--tone=formal` | Formal cover letter | ✓ |
 | `--tone=casual` | Warmer, less stiff cover letter | off |
 
 ## Boundaries
 
-- Never fabricate experience, skills, companies, or education
+- **NEVER fabricate** experience, skills, companies, or education — not even partially, not even implicitly
+- **NEVER exaggerate** a skill the candidate has; surface it accurately and position it well instead
+- **Missing skills are not hidden — they are honestly reframed** using the hierarchy in Step 5
 - Never skip the warning gate
 - Never output resume before user confirms YES
 - If user says NO: suggest what skills to build to improve fit, then stop
+- **LaTeX output is always inline in chat** (copyable code block) unless `--file` flag is present
 - PDF output must be a valid, downloadable file — use reportlab platypus, not canvas, for resume-length documents
 - LaTeX must be compilable — add `% NOTE: compile with pdflatex` comment at top if unsure
-- `--patch` is LaTeX only — in PDF mode, always output full file
+- `--patch` and `--file` are LaTeX only — in PDF mode, always output full downloadable file
 - This skill works in: Claude, Copilot, Gemini CLI, Codex, Cursor, ChatGPT, and any LLM that accepts markdown system instructions
