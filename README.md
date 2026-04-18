@@ -32,7 +32,7 @@ your-project/
 
 ### Way 2 — LaTeX Mode
 
-Your resume lives as `base_resume.tex`. The skill tailors the LaTeX source directly and outputs a compilable `.tex` file. Full control over formatting, surgical edits only, and `--patch` mode available.
+Your resume lives as `base_resume.tex`. The skill tailors the LaTeX source directly and outputs the result **inline in chat as a copyable code block** — no file download unless you ask for one with `--file`. Full control over formatting, surgical edits only, and `--patch` mode available.
 
 **Best for:** Developers who maintain a LaTeX resume, want version-controlled diffs, or need maximum token efficiency.
 
@@ -47,7 +47,7 @@ your-project/
 | | PDF Mode | LaTeX Mode |
 |---|---|---|
 | Setup effort | Low — just place your PDF | Medium — requires LaTeX resume |
-| Output format | Ready-to-send PDF | Compilable .tex (needs pdflatex/Overleaf) |
+| Output format | Ready-to-send PDF | Inline copyable LaTeX (use `--file` for download) |
 | Token efficiency | Moderate | **Best** (especially with --patch) |
 | Patch/diff support | No — full output always | Yes — `--patch` outputs changed blocks only |
 | Cover letter output | PDF | LaTeX |
@@ -227,12 +227,13 @@ Save the output as `base_resume.tex`.
 
 | Flag | What it does | Default |
 |------|-------------|---------|
-| *(none)* | Full tailored resume (PDF or LaTeX) | ✓ |
+| *(none)* | Full tailored resume (PDF download or LaTeX inline) | ✓ |
 | `--cover` | Resume + 3-paragraph cover letter | off |
 | `--cover-only` | Cover letter only | off |
 | `--cover-short` | Resume + 2-paragraph cover letter | off |
 | `--cover-long` | Resume + 4-5 paragraph cover letter | off |
 | `--patch` | Changed sections only — LaTeX mode only | off |
+| `--file` | Write LaTeX to downloadable file — LaTeX mode only | off |
 | `--tone=formal` | Formal cover letter tone | ✓ |
 | `--tone=casual` | Warmer, less stiff tone | off |
 
@@ -265,6 +266,21 @@ If more than half of required skills are missing or match score is below 50, you
 
 ---
 
+## Missing Skills — Honest Positioning
+
+The skill never lies about gaps. But it also never abandons you to a naked skills list that undersells your real potential.
+
+When a required skill is missing from your resume, the skill applies this logic in order:
+
+1. **Transferable foundation** — surfaces adjacent experience that maps to the gap (e.g., Docker + CI/CD experience is positioned toward a Kubernetes requirement)
+2. **Active learning signal** — uses concrete language like "currently building with X" or "deepening expertise in Y" when you're actively moving toward the skill — never vague hedges like "familiar with" or "some experience"
+3. **Quick-learner evidence** — uses real examples from your resume to show fast skill acquisition, not invented ones
+4. **Honest omission** — if none of the above apply, the skill is left out entirely. A clean gap is less damaging than a detectable exaggeration.
+
+The goal: you never sound like you're hiding something, and you never sound unqualified. Growth-oriented self-awareness reads well to recruiters.
+
+---
+
 ## ATS Rules Enforced
 
 **Never uses:**
@@ -287,11 +303,12 @@ If more than half of required skills are missing or match score is below 50, you
 
 ## Honest Limitations
 
-- The skill cannot fabricate skills or experience you don't have — it only surfaces and repositions what's real
+- The skill never fabricates skills or experience you don't have, and never exaggerates what you do have. Missing skills are reframed honestly — surfacing transferable foundations, signaling active learning, or omitted entirely if no honest angle exists.
+- "Actively learning" language is used only when it reads as genuine and is supported by something in the resume. Never as a cover for a complete gap.
 - Interview probability is an estimate based on keyword and seniority alignment, not a recruiter's actual decision
 - PDF output uses reportlab — visual fidelity matches the original resume's structure but font rendering may differ slightly from the source
-- LaTeX output must be compiled — use Overleaf, pdflatex, or XeLaTeX locally
-- `--patch` is only available in LaTeX mode
+- LaTeX output is inline in chat by default — add `--file` if you want a downloadable `.tex` file
+- `--patch` and `--file` are only available in LaTeX mode
 - Very niche or unusual LaTeX resume packages may need minor manual adjustments after output
 
 ---
