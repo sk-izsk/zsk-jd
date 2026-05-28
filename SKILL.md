@@ -1,6 +1,9 @@
 ---
 name: zsk-jd
-description: Job description tailoring skill. Tailors resumes, cover letters, emails and LinkedIn messages to a JD. Flags: --cover, --patch, --yes, --email, --linkedin. Triggers on /zsk-jd, "tailor resume", "match my resume to this JD".
+description: >
+  Job description tailoring skill. Tailors resumes, cover letters, emails,
+  and LinkedIn messages to a JD. Flags: --cover, --patch, --yes, --email,
+  --linkedin. Triggers on /zsk-jd, "tailor resume", "match my resume to this JD".
 ---
 
 Token-efficient resume tailoring. No fluff. Only output: analysis → warning → resume (PDF or LaTeX) + optional cover letter.
