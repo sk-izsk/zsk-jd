@@ -1,17 +1,7 @@
-***
-
+---
 name: zsk-jd
-description: >
-Job description tailoring skill. User pastes a JD via /zsk-jd and Claude
-produces a tailored resume + optional cover letter in LaTeX or PDF format.
-Performs ATS optimization, skill-gap analysis, and interview probability
-scoring before generating output. Supports base\_resume.pdf (highest priority),
-base\_resume.tex (second priority), or inline paste (LaTeX or PDF).
-Flags: --cover, --cover-only, --patch, --cover-short, --cover-long,
-\--tone=formal|casual, --yes, --email, --linkedin. Triggers on: /zsk-jd,
-"tailor resume", "match my resume to this JD", "customize resume for job",
-"ATS resume".
--------------
+description: Job description tailoring skill. Tailors resumes, cover letters, emails and LinkedIn messages to a JD. Flags: --cover, --patch, --yes, --email, --linkedin. Triggers on /zsk-jd, "tailor resume", "match my resume to this JD".
+---
 
 Token-efficient resume tailoring. No fluff. Only output: analysis → warning → resume (PDF or LaTeX) + optional cover letter.
 
