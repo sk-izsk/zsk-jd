@@ -244,6 +244,50 @@ Reframing hierarchy — apply in order:
 * "applied \[transferable skill] in contexts that map directly to \[JD need]"
 * "background in \[related domain] with active focus on \[gap area]"
 
+### Project Selection, Ordering, and 2-Page Budget (MANDATORY)
+
+**The tailored resume output must not exceed 2 pages when compiled. This constraint is non-negotiable.**
+
+#### Project scoring
+
+Before writing any output, score every project entry in the resume against the JD using three signals:
+
+1. **Tech stack overlap** — how many tools/libraries in the project match JD requirements
+2. **Domain match** — does the project domain (real-time, visualization, mobile, full-stack, etc.) map to what the JD describes
+3. **Feature similarity** — do the project's key features (auth, state management, performance work, cross-platform, etc.) mirror what the JD asks for
+
+Score each project: High / Medium / Low relevance.
+
+#### Project ordering
+
+Reorder the Projects section so High relevance entries appear first, Medium second, Low last. Work-history projects (SwiftConnect, Guiker) always stay at the top of the Projects section regardless of relevance score — they are employment evidence, not just portfolio items.
+
+#### Project trimming by relevance tier
+
+Apply this budget per project based on relevance score:
+
+| Relevance | Bullet budget | Action |
+|-----------|---------------|--------|
+| High      | 2-3 bullets, full detail | Keep as-is or expand to surface JD keywords |
+| Medium    | 1-2 tight bullets | Trim to the most JD-relevant points only |
+| Low       | 0-1 bullets | Remove entirely OR keep as a one-liner if it adds a unique skill not shown elsewhere |
+
+**Work-history projects (SwiftConnect, Guiker):** Keep all bullets unless page budget is critically over; in that case trim 1 bullet from the least JD-relevant entry only.
+
+#### Page budget enforcement
+
+After drafting, check if the content fits within 2 pages at standard LaTeX settings (11pt charter, letter size, 0.5in margins). If over budget, trim in this exact order:
+
+1. Remove the lowest-relevance project entry entirely
+2. Reduce remaining Medium-relevance project bullets to 1 line each
+3. Compress individual bullets across all projects (combine related points, remove redundant stack mentions)
+4. Tighten experience bullets — cut the least JD-relevant bullet from each job entry, never the most relevant one
+5. Tighten the summary to 3 lines max
+
+**Never remove:** Education section, Skills section, any job entry title/dates, or a High-relevance project entry.
+
+***
+
 ### PDF mode output:
 
 Use reportlab (platypus) to generate a clean, professional PDF resume. Preserve visual structure and section layout of the original. Output as downloadable `.pdf` file.
@@ -471,4 +515,3 @@ Would it make sense to have a quick chat?
 * LaTeX must be compilable — add % NOTE: compile with pdflatex comment at top
 * \--patch and --file are LaTeX only — in PDF mode, always output full downloadable file
 * This skill works in: Claude, Copilot, Gemini CLI, Codex, Cursor, ChatGPT, and any LLM that accepts markdown system instructions
-
